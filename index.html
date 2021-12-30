@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Messages</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <style>
+            li {
+                list-style-type: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Messages list</h1>
+        <form action='' onsubmit='sendMessage(event)'>
+            <input type='text' id='messageText'>
+            <button>Send</button>
+        </form>
+        <ul id='messages'></ul>
+        <script>
+            var messages = document.getElementById('messages');
+            var ws = new WebSocket("ws://localhost:8000/ws");
+            
+            ws.onmessage = function(e) {
+                var message = document.createElement('li');
+                var map = JSON.parse(e.data);
+                var content = document.createTextNode(map['message']);
+                message.prepend(map['message_id'] + ') ');
+                message.appendChild(content);
+                messages.appendChild(message);
+            };
+
+            function sendMessage(e) {
+                var input = document.getElementById('messageText');
+                if (input.value !== '') {
+                    var map = {'message': input.value}
+                    if (ws.readyState === ws.OPEN)
+                        ws.send(JSON.stringify(map));
+                    else
+                        console.log('bad status');
+                    input.value = '';
+                }
+                event.preventDefault();
+            }
+        </script>
+    </body>
+</html>

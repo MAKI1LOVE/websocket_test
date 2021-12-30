@@ -1,0 +1,3 @@
+httptools==0.1.*
+uvloop
+fastapi
